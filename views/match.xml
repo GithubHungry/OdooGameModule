@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+    <!--tree view of the matches-->
+    <record id="match_tree_view" model="ir.ui.view">
+        <field name="name">game.match.tree</field>
+        <field name="model">game.match</field>
+        <field name="arch" type="xml">
+            <tree string="Matches">
+                <field name="id"/>
+                <field name="winner_team"/>
+                <field name="reg_match_date"/>
+                <field name="duration"/>
+                <field name="server_location"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <!--match form view-->
+    <record id="match_form_view" model="ir.ui.view">
+        <field name="name">game.match.form</field>
+        <field name="model">game.match</field>
+        <field name="arch" type="xml">
+            <form string="Matches">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="id"/>
+                        </h1>
+                    </div>
+                    <group>
+
+                        <group>
+                            <field name="image" widget="image"/>
+                        </group>
+                        <group>
+                            <field name="winner_team"/>
+                            <field name="reg_match_date"/>
+                        </group>
+                        <group>
+                            <field name="server_location"/>
+                            <field name="duration"/>
+                        </group>
+                        <group>
+                            <field name="team_A_score"/>
+                            <field name="team_A_throne"/>
+                        </group>
+                        <group>
+                            <field name="team_B_score"/>
+                            <field name="team_B_throne"/>
+                        </group>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread" options='{"thread_level":1}'/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!--    match kanban view-->
+    <record id="match_kanban" model="ir.ui.view">
+        <field name="name">game.match.kanban</field>
+        <field name="model">game.match</field>
+        <field name="arch" type="xml">
+            <kanban>
+                <field name="id"/>
+                <field name="image"/>
+                <field name="reg_match_date"/>
+                <field name="winner_team"/>
+                <field name="duration"/>
+                <field name="server_location"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_game_match_kanban">
+                            <t t-if="record.image.raw_value">
+                                <div class="o_kanban_image_fill_left d-none d-md-block"
+                                     t-attf-style="background-image:url('#{kanban_image('game.match','image',record.id.raw_value)}')"/>
+                            </t>
+                            <t t-else="">
+                                <img class="o_kanban_image" alt="Game logo"
+                                     src='/game_mod/static/description/battle_icon.png'/>
+                            </t>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="id"/>
+                                </strong>
+                                <div class="o_kanban_tags_selection"/>
+                                <ul>
+                                    <li>Match date-time:
+                                        <field name="reg_match_date"/>
+                                    </li>
+                                    <li>Winner:
+                                        <field name="winner_team"/>
+                                    </li>
+                                    <li>Server location:
+                                        <field name="server_location"/>
+                                    </li>
+                                    <li>Duration:
+                                        <field name="duration"/>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <!--    match graph view    -->
+    <record id="match_location" model="ir.ui.view">
+        <field name="name">game.match.graph</field>
+        <field name="model">game.match</field>
+        <field name="arch" type="xml">
+            <graph string="Games Server Location Statistics">
+                <field name="server_location"/>
+                <field name="duration" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+
+    <!--    match search view-->
+    <record id="game_match_search" model="ir.ui.view">
+        <field name="name">game.match.search</field>
+        <field name="model">game.match</field>
+        <field name="arch" type="xml">
+            <search string="Search matches">
+                <field name="server_location"/>
+                <field name="id"/>
+                <field name="winner_team"/>
+                <filter name="draws" string="Draws" domain="[('winner_team','=','draw')]"/>
+                <filter name="winner_A" string="Winner team A" domain="[('winner_team','=','team_A')]"/>
+                <filter name="winner_B" string="Winner team B" domain="[('winner_team','=','team_B')]"/>
+                <filter name="long_matches" string="Long match (>= 25 min)" domain="[('duration','>=',25)]"/>
+                <filter name="short_matches" string="Short match (&lt; 25min)" domain="[('duration','&lt;',25)]"/>
+                <group expand="0" string="Group by">
+                    <filter string="winner team" name="winner_team" context="{'group_by':'winner_team'}"/>
+                    <filter string="server location" name="server_location" context="{'group_by':'server_location'}"/>
+                    <filter string="reg match date" name="reg_match_date" context="{'group_by':'reg_match_date'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!--action of the matches-->
+    <record id="action_match" model="ir.actions.act_window">
+        <field name="name">Matches</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">game.match</field>
+        <field name="view_mode">kanban,tree,form,graph</field>
+        <field name="context">{'group_by':'winner_team'}</field>
+        <field name="domain">[]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your matches here!
+            </p>
+        </field>
+
+    </record>
+
+
+    <menuitem id="main_root_menu"
+              name="Main"
+              web_icon="game_mod,static/description/icon_menu.png"
+              sequence="0"/>
+
+    <menuitem id="match_menu"
+              web_icon="game_mod,static/description/battle_icon.png"
+              name="Matches"
+              action="action_match"
+              parent="main_root_menu"
+              sequence="10"/>
+</odoo>

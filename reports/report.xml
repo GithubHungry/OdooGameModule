@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <report
+            id="report_match_card"
+            string="Match report"
+            model="game.match"
+            report_type="qweb-pdf"
+            name="game_mod.report_match"
+            file="game_mod.report_match"/>
+</odoo>
